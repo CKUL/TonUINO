@@ -14,6 +14,17 @@ uint16_t firstTrack;
 uint8_t queue[255];
 uint8_t volume;
 
+//Fehlercode Tabelle des DFPlayer
+const string DFPLayer_ERR[7] = {    
+        "DfMp3_Error_Busy",
+        "DfMp3_Error_Sleeping",
+        "DfMp3_Error_SerialWrongStack",
+        "DfMp3_Error_CheckSumNotMatch",
+        "DfMp3_Error_FileIndexOut",
+        "DfMp3_Error_FileMismatch",
+        "DfMp3_Error_Advertise",
+        "DfMp3_Error_General"};
+
 struct folderSettings {
   uint8_t folder;
   uint8_t mode;
@@ -66,7 +77,7 @@ class Mp3Notify {
       // see DfMp3_Error for code meaning
       Serial.println();
       Serial.print("Com Error ");
-      Serial.println(errorCode);
+      Serial.println(DFPLayer_ERR[errorCode-1]);
     }
     static void OnPlayFinished(uint16_t track) {
       //      Serial.print("Track beendet");

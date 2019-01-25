@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/Users/Christopher/Documents/Arduino/libraries",
+                "C:/Users/Christopher/Documents/Arduino/libraries/JC_Button/src",
+                "C:/Users/Christopher/Documents/Arduino/libraries/DFPlayer_Mini_Mp3_by_Makuna/src",
+                "C:/Users/Christopher/Documents/Arduino/libraries/PubSubClient/tests/src/lib",
+                "C:/Users/Christopher/Documents/Arduino/libraries/MFRC522/src",
+                "C:/Program Files (x86)/Arduino/libraries"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "intelliSenseMode": "msvc-x64"
+        }
+    ],
+    "version": 4
+}
