@@ -5,6 +5,8 @@
 #include <SPI.h>
 #include <SoftwareSerial.h>
 #include <avr/sleep.h>
+//#include <">buttons_5.h>
+#include <buttons_3.h>
 
 // DFPlayer Mini
 SoftwareSerial mySoftwareSerial(2, 3); // RX, TX
@@ -306,6 +308,8 @@ MFRC522::StatusCode status;
 #define buttonPause A0
 #define buttonUp A1
 #define buttonDown A2
+#define buttonNext A3
+#define buttonPrevius A4
 #define busyPin 4
 #define shutdownPin 7
 
@@ -314,6 +318,8 @@ MFRC522::StatusCode status;
 Button pauseButton(buttonPause);
 Button upButton(buttonUp);
 Button downButton(buttonDown);
+Button nButton(buttonNext);
+Button pButton(buttonPrevius);
 bool ignorePauseButton = false;
 bool ignoreUpButton = false;
 bool ignoreDownButton = false;
@@ -414,6 +420,8 @@ void setup() {
   pinMode(buttonPause, INPUT_PULLUP);
   pinMode(buttonUp, INPUT_PULLUP);
   pinMode(buttonDown, INPUT_PULLUP);
+  pinMode(buttonNext, INPUT_PULLUP);
+  pinMode(buttonPrevius, INPUT_PULLUP);
   pinMode(shutdownPin, OUTPUT);
   digitalWrite(shutdownPin, LOW);
 
@@ -433,6 +441,8 @@ void readButtons() {
   pauseButton.read();
   upButton.read();
   downButton.read();
+  nButton.read();
+  pButton.read();
 }
 
 void volumeUpButton() {
@@ -561,103 +571,7 @@ void loop() {
   do {
     checkStandbyAtMillis();
     mp3.loop();
-    // Buttons werden nun über JS_Button gehandelt, dadurch kann jede Taste
-    // doppelt belegt werden
-    readButtons();
-
-    // admin menu
-    if ((pauseButton.pressedFor(LONG_PRESS) || upButton.pressedFor(LONG_PRESS) || downButton.pressedFor(LONG_PRESS)) && pauseButton.isPressed() && upButton.isPressed() && downButton.isPressed()) {
-      mp3.pause();
-      do {
-        readButtons();
-      } while (pauseButton.isPressed() || upButton.isPressed() || downButton.isPressed());
-      readButtons();
-      adminMenu();
-      break;
-    }
-
-    if (pauseButton.wasReleased()) {
-      if (ignorePauseButton == false)
-        if (isPlaying()) {
-          mp3.pause();
-          setstandbyTimer();
-        }
-        else if (knownCard) {
-          mp3.start();
-          disablestandbyTimer();
-        }
-      ignorePauseButton = false;
-    } else if (pauseButton.pressedFor(LONG_PRESS) &&
-               ignorePauseButton == false) {
-      if (isPlaying()) {
-        uint8_t advertTrack;
-        if (myFolder->mode == 3 || myFolder->mode == 9) {
-          advertTrack = (queue[currentTrack - 1]);
-        }
-        else {
-          advertTrack = currentTrack;
-        }
-        // Spezialmodus Von-Bis für Album und Party gibt die Dateinummer relativ zur Startposition wieder
-        if (myFolder->mode == 8 || myFolder->mode == 9) {
-          advertTrack = advertTrack - myFolder->special + 1;
-        }
-        mp3.playAdvertisement(advertTrack);
-      }
-      else {
-        playShortCut(0);
-      }
-      ignorePauseButton = true;
-    }
-
-    if (upButton.pressedFor(LONG_PRESS)) {
-      if (isPlaying()) {
-        if (!mySettings.invertVolumeButtons) {
-          volumeUpButton();
-        }
-        else {
-          nextButton();
-        }
-      }
-      else {
-        playShortCut(1);
-      }
-      ignoreUpButton = true;
-    } else if (upButton.wasReleased()) {
-      if (!ignoreUpButton)
-        if (!mySettings.invertVolumeButtons) {
-          nextButton();
-        }
-        else {
-          volumeUpButton();
-        }
-      ignoreUpButton = false;
-    }
-
-    if (downButton.pressedFor(LONG_PRESS)) {
-      if (isPlaying()) {
-        if (!mySettings.invertVolumeButtons) {
-          volumeDownButton();
-        }
-        else {
-          previousButton();
-        }
-      }
-      else {
-        playShortCut(2);
-      }
-      ignoreDownButton = true;
-    } else if (downButton.wasReleased()) {
-      if (!ignoreDownButton) {
-        if (!mySettings.invertVolumeButtons) {
-          previousButton();
-        }
-        else {
-          volumeDownButton();
-        }
-      }
-      ignoreDownButton = false;
-    }
-    // Ende der Buttons
+    buttons();
   } while (!mfrc522.PICC_IsNewCardPresent());
 
   // RFID Karte wurde aufgelegt
