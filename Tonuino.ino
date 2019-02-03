@@ -5,8 +5,8 @@
 #include <SPI.h>
 #include <SoftwareSerial.h>
 #include <avr/sleep.h>
-//#include <">buttons_5.h>
-#include <buttons_3.h>
+//#include "buttons_5.h"
+#include "buttons_3.h"
 
 // DFPlayer Mini
 SoftwareSerial mySoftwareSerial(2, 3); // RX, TX
@@ -16,16 +16,6 @@ uint16_t firstTrack;
 uint8_t queue[255];
 uint8_t volume;
 
-//Fehlercode Tabelle des DFPlayer
-const string DFPLayer_ERR[7] = {    
-        "DfMp3_Error_Busy",
-        "DfMp3_Error_Sleeping",
-        "DfMp3_Error_SerialWrongStack",
-        "DfMp3_Error_CheckSumNotMatch",
-        "DfMp3_Error_FileIndexOut",
-        "DfMp3_Error_FileMismatch",
-        "DfMp3_Error_Advertise",
-        "DfMp3_Error_General"};
 
 struct folderSettings {
   uint8_t folder;
@@ -76,10 +66,38 @@ bool knownCard = false;
 class Mp3Notify {
   public:
     static void OnError(uint16_t errorCode) {
-      // see DfMp3_Error for code meaning
-      Serial.println();
-      Serial.print("Com Error ");
-      Serial.println(DFPLayer_ERR[errorCode-1]);
+    // see DfMp3_Error for code meaning
+    Serial.println();
+    Serial.print("DFPlayer Error: ");
+    Serial.print(errorCode);
+    Serial.println(" --> ");
+    switch(errorCode)
+    {
+        case DfMp3_Error_Busy:
+            Serial.println("DfMp3_Error_Busy");
+            break;
+        case DfMp3_Error_Sleeping:
+            Serial.println("DfMp3_Error_Sleeping");
+            break;
+        case DfMp3_Error_SerialWrongStack:
+            Serial.println("DfMp3_Error_SerialWrongStack");
+            break;
+        case DfMp3_Error_CheckSumNotMatch:
+            Serial.println("DfMp3_Error_CheckSumNotMatch");
+            break;
+        case DfMp3_Error_FileIndexOut:
+            Serial.println("DfMp3_Error_FileIndexOut");
+            break;
+        case DfMp3_Error_FileMismatch:
+            Serial.println("DfMp3_Error_FileMismatch");
+            break;
+        case DfMp3_Error_Advertise:
+            Serial.println("DfMp3_Error_Advertise");
+            break;
+        case DfMp3_Error_General:
+            Serial.println("DfMp3_Error_General");
+            break;
+    }
     }
     static void OnPlayFinished(uint16_t track) {
       //      Serial.print("Track beendet");
